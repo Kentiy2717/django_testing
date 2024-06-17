@@ -1,7 +1,6 @@
 from http import HTTPStatus
 
 import pytest
-from django.urls import reverse
 from pytest_django.asserts import assertRedirects, assertFormError
 
 from news.forms import BAD_WORDS, WARNING
@@ -89,7 +88,6 @@ def test_author_can_edit_comment(
     assert comment.news == news
 
 
-
 def test_user_cant_edit_comment_of_another_user(
         not_author_client,
         author,
@@ -105,6 +103,6 @@ def test_user_cant_edit_comment_of_another_user(
     comments_count_now = Comment.objects.count()
     assert comments_count == comments_count_now
     comment = Comment.objects.get(id=comment.id)
-    assert comment.text == comment_text    
+    assert comment.text == comment_text
     assert comment.author == author
     assert comment.news == news

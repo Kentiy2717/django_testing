@@ -59,7 +59,7 @@ class TestRoutes(TestCase):
                     self.assertRedirects(response, expected_url)
                 else:
                     self.assertEqual(response.status_code, HTTPStatus.OK)
-     
+
     def test_pages_availability_for_author(self):
         urls = (
             HOME_URL,

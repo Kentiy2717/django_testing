@@ -3,10 +3,10 @@ from datetime import datetime, timedelta
 import pytest
 from django.conf import settings
 from django.test.client import Client
-from django.utils import timezone
 from django.urls import reverse
 
 from news.models import News, Comment
+
 
 @pytest.fixture
 def anonymous_client():
@@ -74,7 +74,7 @@ def many_news():
 @pytest.fixture
 def comments(news, author):
     for index in range(10):
-        comment = Comment.objects.create(
+        Comment.objects.create(
             news=news, author=author, text=f'Tекст {index}',
         )
 

@@ -33,7 +33,6 @@ def test_comments_order(client, news, comments, detail_url):
     assert all_timestamps == sorted_timestamps
 
 
-
 def test_anonymous_client_has_no_form(client, detail_url):
     response = client.get(detail_url)
     assert 'form' not in response.context
