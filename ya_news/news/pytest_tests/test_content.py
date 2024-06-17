@@ -1,5 +1,4 @@
 import pytest
-
 from django.conf import settings
 from django.urls import reverse
 
@@ -24,14 +23,7 @@ def test_news_order(client, many_news):
     assert all_dates == sorted_dates
 
 
-@pytest.mark.parametrize(
-    'name, args',
-    (
-        ('news:detail', (pytest.lazy_fixture('id_for_args'))),
-    )
-)
-def test_comments_order(client, news, comments, name, args):
-    detail_url = reverse(name, args=args)
+def test_comments_order(client, news, comments, detail_url):
     response = client.get(detail_url)
     assert 'news' in response.context
     news = response.context['news']
@@ -41,26 +33,13 @@ def test_comments_order(client, news, comments, name, args):
     assert all_timestamps == sorted_timestamps
 
 
-@pytest.mark.parametrize(
-    'name, args',
-    (
-        ('news:detail', (pytest.lazy_fixture('id_for_args'))),
-    )
-)
-def test_anonymous_client_has_no_form(client, name, args):
-    detail_url = reverse(name, args=args)
+
+def test_anonymous_client_has_no_form(client, detail_url):
     response = client.get(detail_url)
     assert 'form' not in response.context
 
 
-@pytest.mark.parametrize(
-    'name, args',
-    (
-        ('news:detail', (pytest.lazy_fixture('id_for_args'))),
-    )
-)
-def test_authorized_client_has_form(author_client, name, args):
-    detail_url = reverse(name, args=args)
+def test_authorized_client_has_form(author_client, detail_url):
     response = author_client.get(detail_url)
     assert 'form' in response.context
     assert isinstance(response.context['form'], CommentForm)
