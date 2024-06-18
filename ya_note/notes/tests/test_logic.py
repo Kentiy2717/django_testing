@@ -1,8 +1,5 @@
 from pytils.translit import slugify
 from http import HTTPStatus
-
-from pytest_django.asserts import assertRedirects, assertFormError
-
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.test.client import Client
@@ -37,7 +34,7 @@ class TestLogicCreate(TestCase):
         """Тест - авторизованный пользователь может создать заметку."""
         self.assertEqual(Note.objects.count(), 0)
         response = self.author_client.post(ADD_URL, data=self.form_data)
-        assertRedirects(response, DONE_URL)
+        self.assertRedirects(response, DONE_URL)
         self.assertEqual(Note.objects.count(), 1)
         new_note = Note.objects.get()
         self.assertEqual(new_note.title, self.form_data['title'])
@@ -50,7 +47,7 @@ class TestLogicCreate(TestCase):
         note_count = Note.objects.count()
         response = self.client.post(ADD_URL, data=self.form_data)
         expected_url = f'{LOGIN_URL}?next={ADD_URL}'
-        assertRedirects(response, expected_url)
+        self.assertRedirects(response, expected_url)
         self.assertEqual(Note.objects.count(), note_count)
 
     def test_empty_slug(self):
@@ -61,7 +58,7 @@ class TestLogicCreate(TestCase):
         self.form_data.pop('slug')
         self.assertEqual(Note.objects.count(), 0)
         response = self.author_client.post(ADD_URL, data=self.form_data)
-        assertRedirects(response, DONE_URL)
+        self.assertRedirects(response, DONE_URL)
         self.assertEqual(Note.objects.count(), 1)
         new_note = Note.objects.get()
         expected_slug = slugify(self.form_data['title'])

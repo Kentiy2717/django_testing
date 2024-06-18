@@ -51,9 +51,7 @@ class TestRoutes(TestCase):
         )
 
     def test_pages_availability_for_anonymous_user(self):
-        """
-        Тест - доступность страниц и редирект для анонимного пользователя.
-        """
+        """Тест - доступность страниц для анонимного пользователя."""
         url_for_anonymous_user = (
             HOME_URL,
             LOGIN_URL,
