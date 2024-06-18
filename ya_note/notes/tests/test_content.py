@@ -33,26 +33,38 @@ class TestContent(TestCase):
         )
 
     def test_notes_list_for_author(self):
+        """
+        Тест - отдельная заметка
+        передаётся на страницу со списком заметок
+        в списке 'object_list' в словаре 'context'.
+        """
         response = self.author_client.get(LIST_URL)
         object_list = response.context['object_list']
         note_count = object_list.count()
         self.assertEqual(note_count, 1)
         self.assertIn(self.note, object_list)
-        for note in object_list:
-            self.assertEqual(note.title, self.note.title)
-            self.assertEqual(note.text, self.note.text)
-            self.assertEqual(note.slug, self.note.slug)
-            self.assertEqual(note.author, self.note.author)
+        self.assertEqual(object_list[0].title, self.note.title)
+        self.assertEqual(object_list[0].text, self.note.text)
+        self.assertEqual(object_list[0].slug, self.note.slug)
+        self.assertEqual(object_list[0].author, self.note.author)
 
     def test_notes_list_for_not_author(self):
+        """
+        Тест - в список заметок одного пользователя не попадают
+        заметки другого пользователя.
+        """
         response = self.not_author_client.get(LIST_URL)
         object_list = response.context['object_list']
         note_count = object_list.count()
         self.assertEqual(note_count, 0)
 
     def test_pages_contains_form(self):
+        """
+        Тест - на страницы создания и редактирования заметки
+        передаются формы.
+        """
         urls = (EDIT_URL, ADD_URL)
         for url in urls:
             response = self.author_client.get(url)
-            assert 'form' in response.context
-            assert isinstance(response.context['form'], NoteForm)
+            self.assertIn('form', response.context)
+            self.assertIsInstance(response.context['form'], NoteForm)

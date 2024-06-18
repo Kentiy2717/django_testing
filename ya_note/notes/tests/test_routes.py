@@ -37,31 +37,7 @@ class TestRoutes(TestCase):
             slug='note-slug',
             author=cls.author,
         )
-
-    def test_pages_availability_for_anonymous_user(self):
-        urls = (
-            (HOME_URL, False),
-            (LOGIN_URL, False),
-            (SIGNUP_URL, False),
-            (DETAIL_URL, True),
-            (EDIT_URL, True),
-            (LIST_URL, True),
-            (ADD_URL, True),
-            (DONE_URL, True),
-            (ADD_URL, True),
-            (LOGOUT_URL, False),
-        )
-        for url, args in urls:
-            response = self.client.get(url)
-            with self.subTest(url=url, args=args):
-                if args:
-                    expected_url = f'{LOGIN_URL}?next={url}'
-                    self.assertRedirects(response, expected_url)
-                else:
-                    self.assertEqual(response.status_code, HTTPStatus.OK)
-
-    def test_pages_availability_for_author(self):
-        urls = (
+        cls.urls = (
             HOME_URL,
             LOGIN_URL,
             SIGNUP_URL,
@@ -70,35 +46,53 @@ class TestRoutes(TestCase):
             LIST_URL,
             ADD_URL,
             DONE_URL,
-            ADD_URL,
             DELETE_URL,
             LOGOUT_URL,
         )
-        for url in urls:
+
+    def test_pages_availability_for_anonymous_user(self):
+        """
+        Тест - доступность страниц и редирект для анонимного пользователя.
+        """
+        url_for_anonymous_user = (
+            HOME_URL,
+            LOGIN_URL,
+            SIGNUP_URL,
+            LOGOUT_URL,
+        )
+        for url in self.urls:
+            response = self.client.get(url)
+            with self.subTest(url=url):
+                if url in url_for_anonymous_user:
+                    self.assertEqual(response.status_code, HTTPStatus.OK)
+                else:
+                    expected_url = f'{LOGIN_URL}?next={url}'
+                    self.assertRedirects(response, expected_url)
+
+    def test_pages_availability_for_author(self):
+        """Тест - доступность всех страниц для автора."""
+        for url in self.urls:
             response = self.author_client.get(url)
             with self.subTest(url=url):
                 self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_pages_availability_for_auth_user(self):
-        urls = (
-            (HOME_URL, False),
-            (LOGIN_URL, False),
-            (SIGNUP_URL, False),
-            (DETAIL_URL, True),
-            (EDIT_URL, True),
-            (LIST_URL, False),
-            (ADD_URL, False),
-            (DONE_URL, False),
-            (ADD_URL, False),
-            (DELETE_URL, True),
-            (LOGOUT_URL, False),
+        """Тест - доступность страниц для авторизованного пользователя."""
+        url_for_auth_user = (
+            HOME_URL,
+            LOGIN_URL,
+            SIGNUP_URL,
+            LIST_URL,
+            ADD_URL,
+            DONE_URL,
+            LOGOUT_URL,
         )
-        for url, args in urls:
+        for url in self.urls:
             response = self.not_author_client.get(url)
-            with self.subTest(url=url, args=args, response=response):
-                if args:
+            with self.subTest(url=url):
+                if url in url_for_auth_user:
+                    self.assertEqual(response.status_code, HTTPStatus.OK)
+                else:
                     self.assertEqual(
                         response.status_code, HTTPStatus.NOT_FOUND
                     )
-                else:
-                    self.assertEqual(response.status_code, HTTPStatus.OK)

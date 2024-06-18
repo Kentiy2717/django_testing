@@ -9,6 +9,7 @@ pytestmark = pytest.mark.django_db
 
 
 def test_news_count(client, many_news):
+    """Тест - анонимному пользователю доступен список новостей."""
     response = client.get(HOME_URL)
     object_list = response.context['object_list']
     news_count = object_list.count()
@@ -16,6 +17,7 @@ def test_news_count(client, many_news):
 
 
 def test_news_order(client, many_news):
+    """Тест - проверка сортировки новостей."""
     response = client.get(HOME_URL)
     object_list = response.context['object_list']
     all_dates = [news.date for news in object_list]
@@ -24,6 +26,7 @@ def test_news_order(client, many_news):
 
 
 def test_comments_order(client, news, comments, detail_url):
+    """Тест - проверка сортировки комментариев."""
     response = client.get(detail_url)
     assert 'news' in response.context
     news = response.context['news']
@@ -34,11 +37,19 @@ def test_comments_order(client, news, comments, detail_url):
 
 
 def test_anonymous_client_has_no_form(client, detail_url):
+    """
+    Тест - анонимному пользователю недоступна форма
+    для отправки комментария.
+    """
     response = client.get(detail_url)
     assert 'form' not in response.context
 
 
 def test_authorized_client_has_form(author_client, detail_url):
+    """
+    Тест - авторизованному пользователю доступна форма
+    для отправки комментария.
+    """
     response = author_client.get(detail_url)
     assert 'form' in response.context
     assert isinstance(response.context['form'], CommentForm)
