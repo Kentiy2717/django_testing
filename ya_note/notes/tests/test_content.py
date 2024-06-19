@@ -43,10 +43,11 @@ class TestContent(TestCase):
         note_count = object_list.count()
         self.assertEqual(note_count, 1)
         self.assertIn(self.note, object_list)
-        self.assertEqual(object_list[0].title, self.note.title)
-        self.assertEqual(object_list[0].text, self.note.text)
-        self.assertEqual(object_list[0].slug, self.note.slug)
-        self.assertEqual(object_list[0].author, self.note.author)
+        note = object_list[0]
+        self.assertEqual(note.title, self.note.title)
+        self.assertEqual(note.text, self.note.text)
+        self.assertEqual(note.slug, self.note.slug)
+        self.assertEqual(note.author, self.note.author)
 
     def test_notes_list_for_not_author(self):
         """
@@ -65,6 +66,7 @@ class TestContent(TestCase):
         """
         urls = (EDIT_URL, ADD_URL)
         for url in urls:
-            response = self.author_client.get(url)
-            self.assertIn('form', response.context)
-            self.assertIsInstance(response.context['form'], NoteForm)
+            with self.subTest(url=url):
+                response = self.author_client.get(url)
+                self.assertIn('form', response.context)
+                self.assertIsInstance(response.context['form'], NoteForm)

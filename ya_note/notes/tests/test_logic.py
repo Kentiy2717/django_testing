@@ -1,5 +1,6 @@
 from pytils.translit import slugify
 from http import HTTPStatus
+
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.test.client import Client
@@ -105,12 +106,12 @@ class TestLogicEdit(TestCase):
         note_count_now = Note.objects.count()
         response = self.author_client.post(EDIT_URL, self.form_data)
         self.assertRedirects(response, DONE_URL)
-        self.note.refresh_from_db()
+        note_from_db = note = Note.objects.get()
         self.assertEqual(Note.objects.count(), note_count_now)
-        self.assertEqual(self.note.title, self.form_data['title'])
-        self.assertEqual(self.note.text, self.form_data['text'])
-        self.assertEqual(self.note.slug, self.form_data['slug'])
-        self.assertEqual(self.note.author, self.author)
+        self.assertEqual(note.title, self.form_data['title'])
+        self.assertEqual(note.text, self.form_data['text'])
+        self.assertEqual(note.slug, self.form_data['slug'])
+        self.assertEqual(note.author, note_from_db.author)
 
     def test_other_user_cant_edit_note(self):
         """Тест - пользователь не может редактировать чужие заметки."""
@@ -118,10 +119,11 @@ class TestLogicEdit(TestCase):
         response = self.not_author_client.post(EDIT_URL, self.form_data)
         self.assertEqual(Note.objects.count(), note_count_now)
         self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
-        note_from_db = Note.objects.get(id=self.note.id)
+        note_from_db = Note.objects.get()
         self.assertEqual(self.note.title, note_from_db.title)
         self.assertEqual(self.note.text, note_from_db.text)
         self.assertEqual(self.note.slug, note_from_db.slug)
+        self.assertEqual(self.note.author, note_from_db.author)
 
     def test_author_can_delete_note(self):
         """Тест - автор может удалить свою заметку."""

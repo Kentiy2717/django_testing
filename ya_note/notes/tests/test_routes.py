@@ -77,20 +77,16 @@ class TestRoutes(TestCase):
     def test_pages_availability_for_auth_user(self):
         """Тест - доступность страниц для авторизованного пользователя."""
         url_for_auth_user = (
-            HOME_URL,
-            LOGIN_URL,
-            SIGNUP_URL,
-            LIST_URL,
-            ADD_URL,
-            DONE_URL,
-            LOGOUT_URL,
+            DETAIL_URL,
+            EDIT_URL,
+            DELETE_URL,
         )
         for url in self.urls:
             response = self.not_author_client.get(url)
             with self.subTest(url=url):
                 if url in url_for_auth_user:
-                    self.assertEqual(response.status_code, HTTPStatus.OK)
-                else:
                     self.assertEqual(
                         response.status_code, HTTPStatus.NOT_FOUND
                     )
+                else:
+                    self.assertEqual(response.status_code, HTTPStatus.OK)
